@@ -1,22 +1,41 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const htmlRoutes = require('./routes/htmlRoutes');
+// const htmlRoutes = require('./routes/htmlRoutes');
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
+
+const termData = require('./db/db.json');
 
 const app = express();
 
+//middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-
 app.use(express.static('public'));
 
-app.use('/', htmlRoutes);
+//GET
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '/public/index.html'))
+})
 
-// app.get('/api/terms', (req, res) => res.json(termData));
+  //redirects to notes.html after submit clicked from index.html
+app.get('/notes', (req, res) => {
+  res.sendFile(path.join(__dirname, '/public/notes.html'));
+});
 
+
+
+// app.post('/api/notes', (req, res) => {
+//   console.info(`${req.method} start note app`)
+// })
+
+//GET route for api to return json data
+// app.get('/api', (req, res) => {
+//   res.json(termData)
+// });
+
+//server listening
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
 });

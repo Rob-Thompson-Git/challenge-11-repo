@@ -1,12 +1,16 @@
+//importing express, fs, and path packages
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-// const htmlRoutes = require('./routes/htmlRoutes');
+const uuid = require('./helpers/fsUtils');
+const {readFromFile, readAndAppend} = require('./helpers/fsUtils');
 
 const PORT = process.env.PORT || 3001;
 
-const termData = require('./db/db.json');
+//importing db.json file
+const noteData = require('./db/db.json');
 
+//initializing app variable
 const app = express();
 
 //middleware
@@ -24,16 +28,31 @@ app.get('/notes', (req, res) => {
   res.sendFile(path.join(__dirname, '/public/notes.html'));
 });
 
+//GET route for retrieving new note
+app.get('/api/notes', (req, res) => {
+  readFromFile('./db/db.json', 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+    } else {
+      res.json(JSON.parse(data))
+    }
+  });
+}
+);
 
+//POST route for a new note
+app.post('/api/notes', (req, res) => {
+  const { title, text} = req.body;
+  const newNote = {
+    title,
+    text,
+    note_id: uuid(),
+  }
 
-// app.post('/api/notes', (req, res) => {
-//   console.info(`${req.method} start note app`)
-// })
-
-//GET route for api to return json data
-// app.get('/api', (req, res) => {
-//   res.json(termData)
-// });
+  readAndAppend(newNote, './db/db.json');
+    res.json(`Tip added successfully 🚀`);
+  
+  });
 
 //server listening
 app.listen(PORT, () => {

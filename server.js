@@ -2,7 +2,7 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const uuid = require('./helpers/fsUtils');
+const uuid = require('uuid').v4;
 const {readFromFile, readAndAppend} = require('./helpers/fsUtils');
 
 const PORT = process.env.PORT || 3001;
@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '/public/index.html'))
 })
 
-  //redirects to notes.html after submit clicked from index.html
+//redirects to notes.html after submit clicked from index.html
 app.get('/notes', (req, res) => {
   res.sendFile(path.join(__dirname, '/public/notes.html'));
 });
@@ -46,11 +46,16 @@ app.post('/api/notes', (req, res) => {
   const newNote = {
     title,
     text,
-    note_id: uuid(),
+    id: uuid(),
   }
 
+  const response = {
+    status: 'success',
+    body: newNote,
+  };
+
   readAndAppend(newNote, './db/db.json');
-    res.json(`Tip added successfully 🚀`);
+    res.json(response);
   
   });
 
